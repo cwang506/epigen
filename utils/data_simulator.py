@@ -220,7 +220,9 @@ class DataSimulator(object):
             if snp >= self.total_num_snps:
                 raise ValueError("Genotype corpus contains no SNP with ID {}.".format(snp))
         if len(self.input_disease_snps) > 0 and len(self.input_disease_snps) != self.model.size:
-            raise ValueError("The sizes of the disease SNP set and the epistasis model don't match. Disease SNP set size: {}; model size: {}.".format(len(self.disease_snps), self.model.size))
+            print("input disease snp size: %s" %len(self.input_disease_snps))
+            print("model size: %s"%self.model.size)
+            raise ValueError("The sizes of the disease SNP set and the epistasis model don't match. Disease SNP set size: %s; model size: %s."%(len(self.input_disease_snps), self.model.size))
 
     def set_sim_id(self, sim_id):
         """Sets the simulation ID and prepares next simulation on top of pre-loaded corpus.
@@ -383,10 +385,12 @@ class DataSimulator(object):
         # Dump genotype.
         if self.compress:
             # Dump compressed data.
-            with bz2.open("sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + ".json.bz2", "wt", encoding="ascii") as zipfile:
+            with bz2.open("sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in self.disease_snps]) + "_disease_snps"
+                    +".json.bz2", "wt", encoding="ascii") as zipfile:
                 json.dump(simulated_data, zipfile)
         else:
             # Dump un-compressed data.
-            with open("sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + ".json", "wt", encoding="ascii") as jsonfile:
+            with open("sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in self.disease_snps]) + "_disease_snps"
+                    +".json", "wt", encoding="ascii") as jsonfile:
                 json.dump(simulated_data, jsonfile)
         
