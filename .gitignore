@@ -5,7 +5,7 @@
 # Simulated data
 /sim/* 
 !/sim/README.md
-*.json
+/sim2/*
 # Temporary files
 /temp/*
 !/temp/README.md
