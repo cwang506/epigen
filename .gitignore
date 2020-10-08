@@ -4,6 +4,7 @@
 
 # Simulated data
 /sim/* 
+sim/*
 !/sim/README.md
 
 # Temporary files
