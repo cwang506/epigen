@@ -4,7 +4,7 @@
 
 # Simulated data
 /sim/* 
-sim/*
+/sim/0_1_ASW_3000_inds.json
 !/sim/README.md
 
 # Temporary files
