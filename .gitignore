@@ -3,9 +3,9 @@
 .pydevproject
 
 # Simulated data
-# /sim/* 
-# !/sim/README.md
-/sim2/*
+/sim/*
+!/sim/README.md
+/sim2
 # Temporary files
 /temp/*
 !/temp/README.md
