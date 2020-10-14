@@ -28,7 +28,7 @@ def convert_to_sparse_matrix(corpora_id, pop, firsthalf = True):
 
     #make the transpose of the matrix
     lis = []
-    rows = range(genotype.shape[0]//2) if firstHalf else range(genotype.shape[0]//2, genotype.shape[0])
+    rows = range(genotype.shape[0])#range(genotype.shape[0]//2) if firstHalf else range(genotype.shape[0]//2, genotype.shape[0])
     for r in tqdm(rows):
         row = genotype[r:r+1, :]
         inds = np.where(row != 0)
@@ -49,9 +49,9 @@ def convert_to_sparse_matrix(corpora_id, pop, firsthalf = True):
 if __name__=="__main__":
     corpora_id = sys.argv[1]
     pop = sys.argv[2]
-    firstHalf = sys.argv[3]
-    suffix = 1 if firstHalf else 2
-    csc_sparse_genotype = convert_to_sparse_matrix(corpora_id, pop, firstHalf)
-    fname = os.path.join("../corpora", "%s_%s_sparse_genotype_%s"%(corpora_id, pop, suffix))
+    # firstHalf = sys.argv[3]
+    # suffix = 1 if firstHalf else 2
+    csc_sparse_genotype = convert_to_sparse_matrix(corpora_id, pop)
+    fname = os.path.join("../corpora", "%s_%s_sparse_genotype"%(corpora_id, pop))
     save_npz(fname, csc_sparse_genotype)    
     
