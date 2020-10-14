@@ -5,13 +5,14 @@
 # Simulated data
 /sim/*
 !/sim/README.md
-/sim2
+
 # Temporary files
 /temp/*
 !/temp/README.md
 
 # Corpora except for the precomputed ones.
 /corpora/*
+/corpora_manual/*
 !/corpora/README.md
 !/corpora/[1-9]_ASW_*.bz2
 !/corpora/[1-9]_CEU_*.bz2

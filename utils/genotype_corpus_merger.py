@@ -116,7 +116,7 @@ class GenotypeCorpusMerger(object):
         # Merge the corpora.
         for pos in range(1, len(self.corpus_ids)):
             corpus_id = self.corpus_ids[pos]
-            pop = self.pops[0]
+            pop = self.pops[0] #this should be pos
             if os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json"):
                 with open("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json", "rt") as jsonfile:
                     try:

@@ -28,6 +28,8 @@ import os.path
 from .extensional_model import ExtensionalModel
 from .parametrized_model import ParametrizedModel
 from scipy import stats
+from scipy.sparse import csc_matrix, lil_matrix, coo_matrix, load_npz
+from tqdm import tqdm
 
 class DataSimulator(object):
     """Simulates epistasis data given a pre-generated genotype corpus.
@@ -90,7 +92,10 @@ class DataSimulator(object):
         
         # Load genotype corpus.
         print("Loading genotype corpus.")
-        if os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json"):
+        if os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.npy"):
+            print("using pickle") #todo: add in bz2 option
+            self.corpus_genotype = np.load("corpora/" + str(corpus_id) + "_" + pop + "_genotype.npy")
+        elif os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json"):
             with open("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json", "rt") as jsonfile:
                 self.corpus_genotype = np.asarray(json.load(jsonfile), dtype=np.uint8)
         elif os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json.bz2"):
@@ -369,28 +374,90 @@ class DataSimulator(object):
         
         # Sort the selected individuals and adjust the genotype, phenotype and MAF arrays.
         selected_inds = sorted(selected_inds)
-        self.genotype = self.genotype[:,selected_inds]
+        #use ravel technique to find genotype
+        #get selected inds
+        #convert genotpe to sparse array
+        # sparse_genotype = lil_matrix(self.genotype.shape)
+        # for row in tqdm(range(self.genotype.shape[0])):
+        #     for col in (range(self.genotype.shape[1])):
+        #         if self.genotype[row, col] != 0:
+        #             sparse_genotype[row, col] = self.genotype[row, col]
+        # sparse_genotype = csc_matrix(sparse_genotype)
+        # sparse_genotype = sparse_genotype[:, selected_inds]
+        # print("converting to sparse")
+        # inds_non_zero = np.where(self.genotype!=0)
+        # non_zero_values = self.genotype[inds_non_zero]
+        # coo_sparse_genotype = coo_matrix((non_zero_values, inds_non_zero), shape = self.genotype.shape)
+        # print("converting to csc")
+        # sparse_genotype = csc_matrix(coo_sparse_genotype)
+        # print("selecting inds")
+        # sparse_genotype = sparse_genotype[:, selected_inds]
+        # print('setting into genotype')
+
+        #load in sparse genotype
+        fname = "/Users/crystalwang/Documents/F20/epigen/corpora/%s_%s_sparse_genotype.npz"%(self.corpus_id, self.pop)
+        print(fname)
+        if os.path.exists(fname):
+            print("using sparse genotype matrix")
+            #csc matrix
+            sparse_genotype = load_npz(fname)
+            sparse_genotype = sparse_genotype[:, selected_inds]
+            print("converting to array")
+            self.genotype = sparse_genotype.toarray()
+        else:
+            self.genotype = self.genotype[:, selected_inds]
+        # self.genotype = (self.genotype.ravel()[(selected_inds + (rows*self.genotype.shape[1]).reshape((-1, 1))).ravel()]).reshape(rows.size, selected_inds.size)
+        # self.genotype = self.genotype[:,selected_inds]
         self.phenotype = self.phenotype[selected_inds]
+        print("doing mafs")
         self.mafs = np.sum(self.genotype, axis=1) / (self.num_inds * 2)
         
     def dump_simulated_data(self):
         """Dumps the simulated data."""
         
         print("Serializing the simulated data.")
+       
+        snps_mapping = self.get_corpora_index_from_snps_id()
+        terminal_disease_snps = []
+        for i in self.disease_snps:
+            snp_id = self.snps[i][0] #rsid
+            terminal_index = snps_mapping[snp_id]
+            terminal_disease_snps.append(terminal_index)
+
         model_type = self.model.phenotype
+        #pickle genotype instead of dumping in json
+        dumped_fname = "sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in terminal_disease_snps]) + "_disease_snps"
+        
+        dumped_fname_genotype = dumped_fname + "_genotype"
+        np.save(dumped_fname_genotype, self.genotype)
+
         if model_type == "quantitative":
-            simulated_data = {"num_snps" : self.num_snps, "num_inds" : self.num_inds, "model_type" : "quantitative", "genotype" : self.genotype.tolist(), "phenotype" : self.phenotype.tolist(), "snps" : self.snps, "disease_snps" : self.disease_snps, "mafs" : self.mafs.tolist()}
+            simulated_data = {"num_snps" : self.num_snps, "num_inds" : self.num_inds, "model_type" : "quantitative", "phenotype" : self.phenotype.tolist(), "snps" : self.snps, "disease_snps" : self.disease_snps, "mafs" : self.mafs.tolist()}
         else:
-            simulated_data = {"num_snps" : self.num_snps, "num_inds" : self.num_inds, "model_type" : "categorical", "num_categories" : model_type, "genotype" : self.genotype.tolist(), "phenotype" : self.phenotype.tolist(), "snps" : self.snps, "disease_snps" : self.disease_snps, "mafs" : self.mafs.tolist()}
+            simulated_data = {"num_snps" : self.num_snps, "num_inds" : self.num_inds, "model_type" : "categorical", "num_categories" : model_type, "phenotype" : self.phenotype.tolist(), "snps" : self.snps, "disease_snps" : self.disease_snps, "mafs" : self.mafs.tolist()}
         # Dump genotype.
         if self.compress:
             # Dump compressed data.
-            with bz2.open("sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in self.disease_snps]) + "_disease_snps"
-                    +".json.bz2", "wt", encoding="ascii") as zipfile:
+            with bz2.open(dumped_fname + ".json.bz2", "wt", encoding="ascii") as zipfile:
                 json.dump(simulated_data, zipfile)
         else:
             # Dump un-compressed data.
-            with open("sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in self.disease_snps]) + "_disease_snps"
-                    +".json", "wt", encoding="ascii") as jsonfile:
+            with open(dumped_fname + ".json", "wt", encoding="ascii") as jsonfile:
                 json.dump(simulated_data, jsonfile)
+
+    def get_corpora_index_from_snps_id(self):
+        #make snps to index mapping
+        fname = os.path.join("corpora", '%s_%s_snps.json' %(self.corpus_id, self.pop))
+        if os.path.exists(fname):
+            with open(fname, "r") as f:
+                snps_json = json.load(f)
+        elif os.path.exists(fname + ".bz2"):
+            with open(fname, "rt", encoding="ascii") as f:
+                snps_json = json.load(f)
+        else:
+            raise OSError("Neither %s or %s exist" %(fname, fname + ".bz2"))
+        corpora_snps_mapping = {}
+        for i, snps_id in enumerate(snps_json):
+            corpora_snps_mapping[snps_id[0]] = i
+        return corpora_snps_mapping
         
