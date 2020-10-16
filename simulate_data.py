@@ -306,6 +306,23 @@ def run_script():
         print("Generated data:\t./sim/{}_{}_{}.{}".format(sim_id, args.corpus_id, args.pop, suffix))
     print("\n############################################################################")
 
+def run_script_args(pop, corpus_id, sim_ids, model, snps, inds, disease_snps, biased_distr = [], noise_maf_range = [0, 1], disease_maf_range = [0.1, 1], seed=None, compress=False):
+
+    sim = DataSim(corpus_id, pop, model, snps, inds, disease_snps, biased_distr, noise_maf_range, disease_maf_range, seed, compress)
+    for index in range(len(sim_ids)):
+        sim.set_sim_id(sim_ids[index])
+        sim.sample_snps()
+        sim.generate_phenotype()
+        sim.dump_simulated_data()
+    suffix = "json"
+    if compress:
+        suffix = "json.bz2"
+    print("----------------------------------------------------------------------------")
+    print("Finished simulation of epistasis data.")
+    print("The generated data can be found in the ./sim directory:")
+    for sim_id in sim_ids:
+        print("Generated data:\t./sim/{}_{}_{}.{}".format(sim_id, corpus_id, pop, suffix))
+    print("\n############################################################################")
 
 if __name__ == "__main__":
     run_script()

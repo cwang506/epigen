@@ -419,15 +419,16 @@ class DataSimulator(object):
        
         snps_mapping = self.get_corpora_index_from_snps_id()
         terminal_disease_snps = []
-        for i in self.disease_snps:
+        for i in self.disease_snps[:10]:
             snp_id = self.snps[i][0] #rsid
             terminal_index = snps_mapping[snp_id]
             terminal_disease_snps.append(terminal_index)
 
         model_type = self.model.phenotype
         #pickle genotype instead of dumping in json
-        dumped_fname = "sim/" + str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in terminal_disease_snps]) + "_disease_snps"
-        
+        final_filename = str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in terminal_disease_snps]) + "_disease_snps"
+        dumped_fname_local = "sim/" + final_filename
+        dumped_fname_server = "/nobackup1c/users/cwang506/epigen_data/" + final_filename
         dumped_fname_genotype = dumped_fname + "_genotype"
         np.save(dumped_fname_genotype, self.genotype)
 
@@ -438,11 +439,11 @@ class DataSimulator(object):
         # Dump genotype.
         if self.compress:
             # Dump compressed data.
-            with bz2.open(dumped_fname + ".json.bz2", "wt", encoding="ascii") as zipfile:
+            with bz2.open(dumped_fname_server + ".json.bz2", "wt", encoding="ascii") as zipfile:
                 json.dump(simulated_data, zipfile)
         else:
             # Dump un-compressed data.
-            with open(dumped_fname + ".json", "wt", encoding="ascii") as jsonfile:
+            with open(dumped_fname_server + ".json", "wt", encoding="ascii") as jsonfile:
                 json.dump(simulated_data, jsonfile)
 
     def get_corpora_index_from_snps_id(self):
