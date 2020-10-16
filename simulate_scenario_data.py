@@ -128,7 +128,8 @@ MAF_RANGE_DICT_TEST = {
 def load_maf_data():
     for key in MAF_RANGE_DICT_TRAIN:
         maf_dic = MAF_RANGE_DICT_TRAIN[key]
-        run_script_args(maf_dic['pop'],maf_dic['corpus_id'], list(maf_dic['sim_id']), "models/param_model_train.xml", maf_dic['num_snps'], maf_dic['num_inds'],
+        print(maf_dic)
+        run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_train.xml", maf_dic['num_snps'], maf_dic['num_inds'],
                         maf_dic['disease_snps'])
         
         maf_dic_test = MAF_RANGE_DICT_TEST[key]
