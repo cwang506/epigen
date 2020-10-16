@@ -133,7 +133,7 @@ def load_maf_data():
                         maf_dic['disease_snps'])
         
         maf_dic_test = MAF_RANGE_DICT_TEST[key]
-        run_script_args(maf_dic_test['pop'],maf_dic_test['corpus_id'], list(maf_dic_test['sim_id']), "models/param_model_train.xml", maf_dic_test['num_snps'], maf_dic_test['num_inds'],
+        run_script_args(maf_dic_test['pop'],maf_dic_test['corpus_id'], [maf_dic_test['sim_id']], "models/param_model_train.xml", maf_dic_test['num_snps'], maf_dic_test['num_inds'],
                         maf_dic_test['disease_snps']) #use train model, since we're using all snps
 
 
