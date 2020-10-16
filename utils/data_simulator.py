@@ -429,7 +429,7 @@ class DataSimulator(object):
         final_filename = str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in terminal_disease_snps]) + "_disease_snps"
         dumped_fname_local = "sim/" + final_filename
         dumped_fname_server = "/nobackup1c/users/cwang506/epigen_data/" + final_filename
-        dumped_fname_genotype = dumped_fname + "_genotype"
+        dumped_fname_genotype = dumped_fname_server + "_genotype"
         np.save(dumped_fname_genotype, self.genotype)
 
         if model_type == "quantitative":
