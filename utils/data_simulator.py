@@ -31,6 +31,7 @@ from scipy import stats
 from scipy.sparse import csc_matrix, lil_matrix, coo_matrix, load_npz
 from tqdm import tqdm
 
+
 class DataSimulator(object):
     """Simulates epistasis data given a pre-generated genotype corpus.
     
@@ -429,7 +430,12 @@ class DataSimulator(object):
         final_filename = str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in terminal_disease_snps]) + "_disease_snps"
         dumped_fname_local = "sim/" + final_filename
         dumped_fname_server = "/nobackup1c/users/cwang506/epigen_data/" + final_filename
-        dumped_fname_genotype = dumped_fname_server + "_genotype"
+        onserver = False
+        if onserver:
+            dumped_fname = dumped_fname_server
+        else:
+            dumped_fname = dumped_fname_local
+        dumped_fname_genotype = dumped_fname + "_genotype"
         np.save(dumped_fname_genotype, self.genotype)
 
         if model_type == "quantitative":
@@ -439,11 +445,11 @@ class DataSimulator(object):
         # Dump genotype.
         if self.compress:
             # Dump compressed data.
-            with bz2.open(dumped_fname_server + ".json.bz2", "wt", encoding="ascii") as zipfile:
+            with bz2.open(dumped_fname + ".json.bz2", "wt", encoding="ascii") as zipfile:
                 json.dump(simulated_data, zipfile)
         else:
             # Dump un-compressed data.
-            with open(dumped_fname_server + ".json", "wt", encoding="ascii") as jsonfile:
+            with open(dumped_fname + ".json", "wt", encoding="ascii") as jsonfile:
                 json.dump(simulated_data, jsonfile)
 
     def get_corpora_index_from_snps_id(self):
