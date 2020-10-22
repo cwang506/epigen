@@ -165,7 +165,7 @@ def simulate_maf_data():
         # print(filename)
         # with open(filename) as f:
         #     epigen_json = json.load(f)
-        # maf_dic_test = MAF_RANGE_DICT_TEST[key]
+        maf_dic_test = MAF_RANGE_DICT_TEST[key]
         # corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(maf_dic_test['pop'],maf_dic_test['corpus_id'])
         # snps_in_filename = [] 
         # for snps_id in epigen_json['disease_snps']:
