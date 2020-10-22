@@ -184,7 +184,7 @@ def simulate_maf_data():
         print("generating test data")
         
         run_script_args(maf_dic_test['pop'],maf_dic_test['corpus_id'], [maf_dic_test['sim_id']], "models/param_model_train_simple.xml", maf_dic_test['num_snps'], maf_dic_test['num_inds'],
-                        maf_dict_test['disease_snps']) 
+                        maf_dic_test['disease_snps']) 
 
 
 if __name__ == '__main__':

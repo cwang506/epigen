@@ -1,0 +1,4 @@
+init.c(556):ERROR:161: Cannot initialize TCL
+slurmstepd: error: Job 32118097 exceeded memory limit (18304912 > 16384000), being killed
+slurmstepd: error: Exceeded job memory limit
+slurmstepd: error: *** JOB 32118097 ON node019 CANCELLED AT 2020-10-10T12:04:14 ***

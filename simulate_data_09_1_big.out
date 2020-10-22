@@ -1,0 +1,29 @@
+
+############################################################################
+######################### EpiGEN - simulate_data.py ########################
+
+Loading genotype corpus.
+using pickle
+Genotype corpus contains 1387466 SNPs and 10000 individuals.
+Loading SNPs.
+Loading MAFs.
+Loading cumulative MAF distribution.
+Parsing epistasis model.
+Checking input consistency.
+----------------------------------------------------------------------------
+Starting simulation for simulation ID 0.
+Checking noise MAF range (extend if too narrow).
+Sampling disease SNPs.
+Sampling noise SNPs.
+Updating genotype matrix, MAF array, and SNP list.
+Generating the phenotypes.
+Subsampling the individuals.
+/Users/crystalwang/Documents/F20/epigen/corpora/122_ASW_sparse_genotype.npz
+doing mafs
+Serializing the simulated data.
+----------------------------------------------------------------------------
+Finished simulation of epistasis data.
+The generated data can be found in the ./sim directory:
+Generated data:	./sim/0_122_ASW.json
+
+############################################################################
