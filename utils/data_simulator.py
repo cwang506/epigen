@@ -396,17 +396,17 @@ class DataSimulator(object):
         # print('setting into genotype')
 
         #load in sparse genotype
-        fname = "/Users/crystalwang/Documents/F20/epigen/corpora/%s_%s_sparse_genotype.npz"%(self.corpus_id, self.pop)
-        print(fname)
-        if os.path.exists(fname):
-            print("using sparse genotype matrix")
-            #csc matrix
-            sparse_genotype = load_npz(fname)
-            sparse_genotype = sparse_genotype[:, selected_inds]
-            print("converting to array")
-            self.genotype = sparse_genotype.toarray()
-        else:
-            self.genotype = self.genotype[:, selected_inds]
+        # fname = "/Users/crystalwang/Documents/F20/epigen/corpora/%s_%s_sparse_genotype.npz"%(self.corpus_id, self.pop)
+        # print(fname)
+        # if os.path.exists(fname):
+        #     print("using sparse genotype matrix")
+        #     #csc matrix
+        #     sparse_genotype = load_npz(fname)
+        #     sparse_genotype = sparse_genotype[:, selected_inds]
+        #     print("converting to array")
+        #     self.genotype = sparse_genotype.toarray()
+        # else:
+        self.genotype = self.genotype[:, selected_inds]
         # self.genotype = (self.genotype.ravel()[(selected_inds + (rows*self.genotype.shape[1]).reshape((-1, 1))).ravel()]).reshape(rows.size, selected_inds.size)
         # self.genotype = self.genotype[:,selected_inds]
         self.phenotype = self.phenotype[selected_inds]
