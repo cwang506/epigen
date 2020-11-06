@@ -170,9 +170,9 @@ class ParametrizedModel(object):
         # Compute the joint parameter.
         risk = self.baseline_alpha
         for item in self.marginal_models.items():
-            risk *= item[1](gen_at_snp_set)
+            risk += item[1](gen_at_snp_set)
         for item in self.interaction_models.items():
-            risk *= item[1](gen_at_snp_set)
+            risk += item[1](gen_at_snp_set)
             
         # Generate a quantitative phenotype.
         if self.phenotype == "quantitative":
@@ -206,9 +206,9 @@ class ParametrizedModel(object):
                 else:
                     return 1
             elif model_type == "additive":
-                if gen_at_snp_set[pos] == 0:
-                    return 1
-                else:
+                # if gen_at_snp_set[pos] == 0:
+                    # return 1
+                # else:
                     return (alpha * float(gen_at_snp_set[pos])) / 2.0
             else:
                 msg = "Unsupported model type " + model_type + " for marginal model. "
