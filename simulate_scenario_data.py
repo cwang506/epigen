@@ -131,9 +131,12 @@ MAF_RANGE_DICT_TEST = {
                   "sim_id": 0}                             
 }
 
+on_server = True
+
 def get_simulated_data_fname(sim_id, corpus_id, pop, num_inds, num_snps, disease_snps):
     #disease snps come from terminal 
-    return "sim/" + str(sim_id) + "_" + str(corpus_id) + "_" + pop + "_" +\
+    prefix = "sim/" if not on_server else "/home/cwang506/epigen_data/"
+    return prefix+ str(sim_id) + "_" + str(corpus_id) + "_" + pop + "_" +\
             str(num_inds) + "_inds_" + str(num_snps) + "_snps_" + "_".join([str(i) for i in disease_snps])\
             + "_disease_snps"+".json"
 

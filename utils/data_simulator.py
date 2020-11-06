@@ -431,6 +431,7 @@ class DataSimulator(object):
         dumped_fname_local = "sim/" + final_filename
         dumped_fname_server = "/home/cwang506/epigen_data/" + final_filename #"/nobackup1c/users/cwang506/epigen_data/" + final_filename
         on_server = True
+
         if on_server:
             dumped_fname = dumped_fname_server
         else:
