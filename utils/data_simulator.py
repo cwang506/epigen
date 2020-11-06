@@ -429,7 +429,7 @@ class DataSimulator(object):
         #pickle genotype instead of dumping in json
         final_filename = str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in terminal_disease_snps]) + "_disease_snps"
         dumped_fname_local = "sim/" + final_filename
-        dumped_fname_server = "/nobackup1c/users/cwang506/epigen_data/" + final_filename
+        dumped_fname_server = "/home/cwang506/epigen_data/" + final_filename #"/nobackup1c/users/cwang506/epigen_data/" + final_filename
         on_server = True
         if on_server:
             dumped_fname = dumped_fname_server
