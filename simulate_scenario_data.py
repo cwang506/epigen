@@ -193,7 +193,7 @@ def simulate_maf_data():
             #generate the total set of disease snps + non-disease snps
             disease_snps = MAF_RANGE_DICT_TRAIN[key]['disease_snps'] #np.random.choice(possible_snps, num_disease_snps).tolist()
             first_disease_snps = disease_snps.copy()
-            print(disease_snps) 
+            print(disease_snps)
             run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_train_simple_categorical.xml", maf_dic['num_snps'], maf_dic['num_inds'],
                         disease_snps)
                         
@@ -223,9 +223,6 @@ def simulate_maf_data():
                         snps_in_filename) 
             
         else:
-            #other 
-            if key!= 'MAF_0_01':
-                continue
             first_maf_dic = MAF_RANGE_DICT_TRAIN[first_key]
 
             filename = get_simulated_data_fname(first_maf_dic['sim_id'], first_maf_dic['corpus_id'], 
@@ -253,12 +250,13 @@ def simulate_maf_data():
                 raise RuntimeError("disease snp happens to be in set of other snps")
             run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_test_simple_categorical.xml", maf_dic['num_snps'], maf_dic['num_inds'],
                         snps_in_filename)
-            filename = get_simulated_data_fname(maf_dic['sim_id'], maf_dic['corpus_id'], maf_dic['pop'], maf_dic['num_inds'], maf_dic['num_snps'],disease_snps)
+            filename = get_simulated_data_fname(maf_dic['sim_id'], maf_dic['corpus_id'], maf_dic['pop'], maf_dic['num_inds'], maf_dic['num_snps'],disease_snps, categorical)
             print(filename)
             with open(filename) as f:
                 epigen_json = json.load(f)
             maf_dic_test = MAF_RANGE_DICT_TEST[key]
             corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(maf_dic_test['pop'],maf_dic_test['corpus_id'])
+            snps_in_filename1 = snps_in_filename
             snps_in_filename = [] 
             for snps_id in epigen_json['disease_snps']:
                 snp = epigen_json['snps'][snps_id]
@@ -266,7 +264,6 @@ def simulate_maf_data():
                 snps_in_filename.append(index)
             print(len(epigen_json['snps']))
             print(len(epigen_json['disease_snps']))
-
             for i, snps_id in enumerate(epigen_json['snps']):
                 if i in epigen_json['disease_snps']:
                     continue
@@ -277,6 +274,7 @@ def simulate_maf_data():
                 raise RuntimeError("disease snp happens to be in set of other snps")
             run_script_args(maf_dic_test['pop'],maf_dic_test['corpus_id'], [maf_dic_test['sim_id']], "models/param_model_test_simple_categorical.xml", maf_dic_test['num_snps'], maf_dic_test['num_inds'],
                         snps_in_filename) 
+
             break
 
 if __name__ == '__main__':
