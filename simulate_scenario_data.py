@@ -18,7 +18,7 @@ MAF_RANGE_DICT_TRAIN = {
                   "pop": "ASW",
                   "corpus_id": 122,
                   "sim_id": 0},
-    "MAF_07_08": {"disease_snps": [358180, 563206, 370963, 1044234, 608229, 389776, 249397, 1059367, 987519, 1141382],
+    "MAF_07_08": {"disease_snps": [920960, 390669, 1276901, 470863, 481804, 1195753, 769111, 776837, 767922, 55195],
                   "num_inds":maf_num_inds,
                   "num_snps":maf_num_snps,
                   "pop": "ASW",
@@ -54,7 +54,7 @@ MAF_RANGE_DICT_TRAIN = {
                   "pop": "ASW",
                   "corpus_id": 122,
                   "sim_id": 0},    
-    "MAF_01_02": {"disease_snps":[663788, 801650, 54703, 588522, 364550, 346159, 680523, 493724, 389556, 676752],
+    "MAF_01_02": {"disease_snps":[1047084, 1107340, 507229, 1342591, 882482, 1271943, 1082946, 1102430, 1174389, 1046501],
                   "num_inds":maf_num_inds,
                   "num_snps":maf_num_snps,
                   "pop": "ASW",
@@ -117,7 +117,7 @@ MAF_RANGE_DICT_TEST = {
                   "pop": "CEU",
                   "corpus_id": 122,
                   "sim_id": 0},    
-    "MAF_01_02": {"disease_snps":[663788, 801650, 54703, 588522, 364550, 346159, 680523, 493724, 389556, 676752],
+    "MAF_01_02": {"disease_snps":[1047084, 1107340, 507229, 1342591, 882482, 1271943, 1082946, 1102430, 1174389, 1046501],
                   "num_inds":maf_num_inds,
                   "num_snps":maf_num_snps,
                   "pop": "CEU",
@@ -131,7 +131,7 @@ MAF_RANGE_DICT_TEST = {
                   "sim_id": 0}                             
 }
 
-on_server = True
+on_server = False
 
 def get_simulated_data_fname(sim_id, corpus_id, pop, num_inds, num_snps, disease_snps):
     #disease snps come from terminal 
@@ -176,13 +176,13 @@ def simulate_maf_data():
     for i, key in enumerate(MAF_RANGE_DICT_TRAIN):
         print("generating training data for %s"%key)
         maf_dic = MAF_RANGE_DICT_TRAIN[key]
-        snp_to_maf_training = get_maf_dict(maf_dic['pop'], maf_dic['corpus_id'])
-        #get the maf min and max from the key name
-        maf_min = int(key.split("_")[1])/10.0
-        maf_max = int(key.split("_")[2])/10.0 if key.split("_")[2]!= "1" else 1
-        print(maf_min, maf_max)
+        # snp_to_maf_training = get_maf_dict(maf_dic['pop'], maf_dic['corpus_id'])
+        # # #get the maf min and max from the key name
+        # maf_min = int(key.split("_")[1])/10.0
+        # maf_max = int(key.split("_")[2])/10.0 if key.split("_")[2]!= "1" else 1
+        # print(maf_min, maf_max)
         # possible_snps = [snp_id for snp_id in snp_to_maf_training.keys() \
-                    # if snp_to_maf_training[snp_id]>=maf_min and snp_to_maf_training[snp_id]<=maf_max]
+        #             if snp_to_maf_training[snp_id]>=maf_min and snp_to_maf_training[snp_id]<=maf_max]
         # corpora_snps_mapping = get_corpora_index_from_snps_id(maf_dic['pop'], maf_dic['corpus_id'])
         # possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
 
@@ -193,6 +193,7 @@ def simulate_maf_data():
             disease_snps = MAF_RANGE_DICT_TEST[key]['disease_snps'] #np.random.choice(possible_snps, num_disease_snps).tolist()
             first_disease_snps = disease_snps.copy()
             print(disease_snps) 
+            continue
             run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_train_simple.xml", maf_dic['num_snps'], maf_dic['num_inds'],
                         disease_snps)
                         
@@ -223,6 +224,8 @@ def simulate_maf_data():
             
         else:
             #other 
+            if key!= 'MAF_0_01':
+                continue
             first_maf_dic = MAF_RANGE_DICT_TRAIN[first_key]
             filename = get_simulated_data_fname(first_maf_dic['sim_id'], first_maf_dic['corpus_id'], 
                         first_maf_dic['pop'], first_maf_dic['num_inds'], first_maf_dic['num_snps'], first_disease_snps)
@@ -242,7 +245,7 @@ def simulate_maf_data():
                 snps_in_filename.append(index) 
             #get the disease snps, but have to get rid of the possibilities in snps_in_filename
             # possible_snps_filtered = [k for k in possible_snps if k not in snps_in_filename]
-            disease_snps = MAF_RANGE_DICT_TEST[key]['disease_snps'] #np.random.choice(possible_snps_filtered, num_disease_snps).tolist()
+            disease_snps = maf_dic['disease_snps']#np.random.choice(possible_snps_filtered, num_disease_snps).tolist()
             print(disease_snps)
             snps_in_filename = disease_snps + snps_in_filename
             run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_test_simple.xml", maf_dic['num_snps'], maf_dic['num_inds'],
@@ -258,12 +261,16 @@ def simulate_maf_data():
                 snp = epigen_json['snps'][snps_id]
                 index = corpora_snps_mapping_other_set[snp[0]]
                 snps_in_filename.append(index)
+            print(len(epigen_json['snps']))
+            print(len(epigen_json['disease_snps']))
 
             for i, snps_id in enumerate(epigen_json['snps']):
                 if i in epigen_json['disease_snps']:
                     continue
+                print(i)
                 index = corpora_snps_mapping_other_set[snps_id[0]]
                 snps_in_filename.append(index) #need to map back to CEU data todo
+            print(len(snps_in_filename))
                 
             run_script_args(maf_dic_test['pop'],maf_dic_test['corpus_id'], [maf_dic_test['sim_id']], "models/param_model_test_simple.xml", maf_dic_test['num_snps'], maf_dic_test['num_inds'],
                         snps_in_filename) 

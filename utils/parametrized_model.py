@@ -209,7 +209,7 @@ class ParametrizedModel(object):
                 # if gen_at_snp_set[pos] == 0:
                     # return 1
                 # else:
-                    return (alpha * float(gen_at_snp_set[pos])) / 2.0
+                return (alpha * float(gen_at_snp_set[pos])) / 2.0
             else:
                 msg = "Unsupported model type " + model_type + " for marginal model. "
                 msg += "Choices: \"dominant\", \"recessive\", \"additive\"."
