@@ -9,6 +9,7 @@
 # Temporary files
 /temp/*
 !/temp/README.md
+.vscode/*
 
 # Corpora except for the precomputed ones.
 /corpora/*

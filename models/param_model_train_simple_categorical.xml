@@ -22,7 +22,7 @@
  #//////////////////////////////////////////////////////////////////////////#
  -->
 <!DOCTYPE ParametrizedModel SYSTEM "ParametrizedModel.dtd">
-<ParametrizedModel size="10" phenotype="categorical" stdev="1.3">
+<ParametrizedModel size="10" phenotype="2" stdev="1.3">
     <BaselineModel alpha="15"/>
     <MarginalModel alpha="2" type="additive">
         <pos>0</pos>
