@@ -73,12 +73,12 @@ def merge_corpora(list_of_corpus_ids, list_of_pops, final_corpus_id, append='SNP
     print("serializing the genotype corpus") #pickle genotype
     # with open("corpora_manual/" + str(final_corpus_id) + "_" + pop + "_genotype.json", "wt", encoding="ascii") as jsonfile:
     #     json.dump(genotype.tolist(), jsonfile)
-    np.save("corpora_manual/" + str(final_corpus_id)+"_"+pop+"_genotype", genotype, allow_pickle=True)
-    with open("corpora_manual/" + str(final_corpus_id) + "_" + pop  + "_snps.json", "wt", encoding="ascii") as jsonfile:
+    np.save("corpora/" + str(final_corpus_id)+"_"+pop+"_genotype", genotype, allow_pickle=True)
+    with open("corpora/" + str(final_corpus_id) + "_" + pop  + "_snps.json", "wt", encoding="ascii") as jsonfile:
         json.dump(snps, jsonfile)
-    with open("corpora_manual/" + str(final_corpus_id) + "_" + pop + "_mafs.json", "wt", encoding="ascii") as jsonfile:
+    with open("corpora/" + str(final_corpus_id) + "_" + pop + "_mafs.json", "wt", encoding="ascii") as jsonfile:
         json.dump(mafs.tolist(), jsonfile)
-    with open("corpora_manual/" + str(final_corpus_id) + "_" + pop + "_cum_mafs.json", "wt", encoding="ascii") as jsonfile:
+    with open("corpora/" + str(final_corpus_id) + "_" + pop + "_cum_mafs.json", "wt", encoding="ascii") as jsonfile:
         json.dump(cum_mafs, jsonfile)
 
 def confirm_paths_exist(list_of_corpus_ids, list_of_pops):
@@ -100,3 +100,4 @@ def confirm_paths_exist(list_of_corpus_ids, list_of_pops):
 
 if __name__ == "__main__":
     merge_corpora([i for i in range(1, 23)], ['CEU' for i in range(22)], 122, 'SNPS')
+    merge_corpora([i for i in range(1, 23)], ['ASW' for i in range(22)], 122, 'SNPS')
