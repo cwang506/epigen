@@ -1,0 +1,1 @@
+def disease_snps_different_ld_blocks(disease_snps, num_non_disease_snps, pop, corpus_id)
