@@ -401,10 +401,10 @@ def get_maf_dict(pop, corpora_id):
     #return snp id to its maf
     fname = '%s_%s_snps.json' %(corpora_id, pop)
     maf_dict = {}
-    with open(os.path.join( "corpora", fname), "r") as f:
+    with open(os.path.join( "./corpora", fname), "r") as f:
         snps_json = json.load(f)
     maf_fname = "%s_%s_mafs.json" %(corpora_id, pop)
-    with open(os.path.join("corpora", maf_fname), "r") as f:
+    with open(os.path.join("./corpora", maf_fname), "r") as f:
         mafs_json = json.load(f)
     for i, snps_id in enumerate(snps_json):
         maf_dict[snps_id[0]] = mafs_json[i]
@@ -658,15 +658,25 @@ def simulate_scenario_data_same_ld_block(scenario):
                     snps_in_filename) 
         return train_genotype, train_json, test_genotype, test_json
 
-
-def simulate_maf_data_adaptive(scenario, n, d, random_seed):
+from src2.config import MAF_SETTINGS
+def simulate_maf_data_adaptive(scenario, n, d, train_pop, train_corpus_id, test_pop, test_corpus_id,random_seed):
     #scenario can either be MAF_LOW, MAF_MIDDLE, MAF_HIGH
-    maf_min = None
-    maf_max = None
-    if scenario = "MAF_LOW":
+    num_disease_snps = 10
+    maf_min = MAF_SETTINGS[scenario]["low"]
+    maf_max = MAF_SETTINGS[scenario]["high"]
+    snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
+    possible_snps = [snp_id for snp_id in snp_to_maf_training.keys() \
+                if snp_to_maf_training[snp_id]>=maf_min and snp_to_maf_training[snp_id]<=maf_max]
+    corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
+    possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
+    np.random.seed(random_seed)
+    disease_snps = np.random.choice(possible_snps, num_disease_snps)
+    print(disease_snps)
+
+    
 
 
 
 if __name__ == '__main__':
-    simulate_scenario_data_same_ld_block()
+    simulate_maf_data_adaptive("MAF_LOW", None, None, "ASW", 122, "CEU", 122, 0)
 
