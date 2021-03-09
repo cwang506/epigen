@@ -410,7 +410,7 @@ def get_maf_dict(pop, corpora_id):
         maf_dict[snps_id[0]] = mafs_json[i]
     return maf_dict
 
-def simulate_maf_data_normal():
+def simulate_maf_data_normal(save_to_path=True):
     num_disease_snps = 10
     first_key = None
     first_disease_snps = None
@@ -448,9 +448,9 @@ def simulate_maf_data_normal():
             first_disease_snps = disease_snps.copy()
             print(disease_snps)
             continue
-            run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_train_simple.xml", maf_dic['num_snps'], maf_dic['num_inds'],
+            train_outputs = run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_train_simple.xml", maf_dic['num_snps'], maf_dic['num_inds'],
                         disease_snps)
-                        
+            # train_genotype, train_json = outputs[0]                        
             print("generating test data")
             filename = get_simulated_data_fname(maf_dic['sim_id'], maf_dic['corpus_id'], maf_dic['pop'], maf_dic['num_inds'], maf_dic['num_snps'], disease_snps, categorical)
             print(filename)
@@ -530,7 +530,7 @@ def simulate_maf_data_normal():
                         snps_in_filename) 
 
 
-def simulate_maf_data_different_ld_block():
+def simulate_maf_data_different_ld_block(scenario):
     num_disease_snps = 10
     num_other_snps = 9990
     num_inds = 10000
@@ -539,61 +539,65 @@ def simulate_maf_data_different_ld_block():
     train_corpus_id = 122
     test_pop = 'CEU'
     test_corpus_id = 122
-    for key in MAF_RANGE_DICT_TRAIN:
-        if "DIFF_LD" not in key:
+    # for key in MAF_RANGE_DICT_TRAIN:
+    if "DIFF_LD" not in scenario:
+        print("DIFF_LD not in scenario")
+        return
+    print(scenario)
+    maf_dic = MAF_RANGE_DICT_TRAIN[scenario]
+    snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
+    # print(maf_min, maf_max)
+    # possible_snps = [snp_id for snp_id in snp_to_maf_training.keys() \
+    #             if snp_to_maf_training[snp_id]>=maf_min and snp_to_maf_training[snp_id]<=maf_max]
+    # corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
+    # possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
+    disease_snps = maf_dic['disease_snps']
+    other_snps = []
+    for disease_snp in disease_snps: #range(num_disease_snps):
+        # disease_snp = int(np.random.choice(possible_snps, 1)) 
+        threshold = int(num_other_snps/2/num_disease_snps +0.5)
+        # while disease_snp < threshold:
+        #     disease_snp = np.random.choice(possible_snps, 1)
+        # #pick other snps that are close to this snp
+        # disease_snps.append(disease_snp)
+        other_snps += list(range(disease_snp - threshold, disease_snp + threshold +1))
+        other_snps.remove(disease_snp)
+    
+    print(disease_snps)
+    # disease_snps = disease_snps + other_snps
+    train_genotype, train_json = run_script_args(train_pop,train_corpus_id, [0], "models/param_model_test_simple.xml", num_disease_snps+num_other_snps, num_inds,
+                    (disease_snps+other_snps)[:num_disease_snps+num_other_snps])
+                
+    print("generating test data")
+    filename = get_simulated_data_fname(0, train_corpus_id, train_pop, num_inds, num_disease_snps + num_other_snps, disease_snps, categorical)
+    print(filename)
+    with open(filename) as f:
+        epigen_json = json.load(f)
+
+    corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop,test_corpus_id)
+    snps_in_filename = [] 
+
+    #make the snps the same from train to test
+    for snps_id in epigen_json['disease_snps']:
+        snp = epigen_json['snps'][snps_id]
+        index = corpora_snps_mapping_other_set[snp[0]]
+        snps_in_filename.append(index)
+    print(len(snps_in_filename))
+
+    for i, snps_id in enumerate(epigen_json['snps']):
+        if i in epigen_json['disease_snps']:
             continue
-        print(key)
-        maf_dic = MAF_RANGE_DICT_TRAIN[key]
-        snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
-        # print(maf_min, maf_max)
-        # possible_snps = [snp_id for snp_id in snp_to_maf_training.keys() \
-        #             if snp_to_maf_training[snp_id]>=maf_min and snp_to_maf_training[snp_id]<=maf_max]
-        # corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
-        # possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
-        disease_snps = maf_dic['disease_snps']
-        other_snps = []
-        for disease_snp in disease_snps: #range(num_disease_snps):
-            # disease_snp = int(np.random.choice(possible_snps, 1)) 
-            threshold = int(num_other_snps/2/num_disease_snps +0.5)
-            # while disease_snp < threshold:
-            #     disease_snp = np.random.choice(possible_snps, 1)
-            # #pick other snps that are close to this snp
-            # disease_snps.append(disease_snp)
-            other_snps += list(range(disease_snp - threshold, disease_snp + threshold +1))
-            other_snps.remove(disease_snp)
-        
-        print(disease_snps)
-        # disease_snps = disease_snps + other_snps
-        run_script_args(train_pop,train_corpus_id, [0], "models/param_model_test_simple.xml", num_disease_snps+num_other_snps, num_inds,
-                        (disease_snps+other_snps)[:num_disease_snps+num_other_snps])
-                    
-        print("generating test data")
-        filename = get_simulated_data_fname(0, train_corpus_id, train_pop, num_inds, num_disease_snps + num_other_snps, disease_snps, categorical)
-        print(filename)
-        with open(filename) as f:
-            epigen_json = json.load(f)
+        index = corpora_snps_mapping_other_set[snps_id[0]]
+        snps_in_filename.append(index) #need to map back to CEU data todo
+    print(len(snps_in_filename))
+    test_genotype, test_json = run_script_args(test_pop,test_corpus_id, [0], "models/param_model_test_simple.xml", len(snps_in_filename), num_inds,
+                snps_in_filename) 
 
-        corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop,test_corpus_id)
-        snps_in_filename = [] 
+    return train_genotype, train_json, test_genotype, test_json
 
-        #make the snps the same from train to test
-        for snps_id in epigen_json['disease_snps']:
-            snp = epigen_json['snps'][snps_id]
-            index = corpora_snps_mapping_other_set[snp[0]]
-            snps_in_filename.append(index)
-        print(len(snps_in_filename))
+    
 
-        for i, snps_id in enumerate(epigen_json['snps']):
-            if i in epigen_json['disease_snps']:
-                continue
-            index = corpora_snps_mapping_other_set[snps_id[0]]
-            snps_in_filename.append(index) #need to map back to CEU data todo
-        print(len(snps_in_filename))
-        run_script_args(test_pop,test_corpus_id, [0], "models/param_model_test_simple.xml", len(snps_in_filename), num_inds,
-                    snps_in_filename) 
-        
-
-def simulate_scenario_data_same_ld_block():
+def simulate_scenario_data_same_ld_block(scenario):
     num_disease_snps = 10
     num_other_snps = 9990
     num_inds = 10000
@@ -625,7 +629,7 @@ def simulate_scenario_data_same_ld_block():
         print(len(other_snps))
         print(disease_snps)
         # disease_snps = disease_snps + other_snps
-        run_script_args(train_pop,train_corpus_id, [0], "models/param_model_test_simple.xml", num_disease_snps+num_other_snps, num_inds,
+        train_genotype, train_json = run_script_args(train_pop,train_corpus_id, [0], "models/param_model_test_simple.xml", num_disease_snps+num_other_snps, num_inds,
                         (disease_snps+other_snps)[:num_disease_snps+num_other_snps])
                     
         print("generating test data")
@@ -650,8 +654,17 @@ def simulate_scenario_data_same_ld_block():
         #     index = corpora_snps_mapping_other_set[snps_id[0]]
         #     snps_in_filename.append(index) #need to map back to CEU data todo
         # print(len(snps_in_filename))
-        run_script_args(test_pop,test_corpus_id, [0], "models/param_model_test_simple.xml", len(snps_in_filename), num_inds,
+        test_genotype, test_json = run_script_args(test_pop,test_corpus_id, [0], "models/param_model_test_simple.xml", len(snps_in_filename), num_inds,
                     snps_in_filename) 
+        return train_genotype, train_json, test_genotype, test_json
+
+
+def simulate_maf_data_adaptive(scenario, n, d, random_seed):
+    #scenario can either be MAF_LOW, MAF_MIDDLE, MAF_HIGH
+    maf_min = None
+    maf_max = None
+    if scenario = "MAF_LOW":
+
 
 
 if __name__ == '__main__':

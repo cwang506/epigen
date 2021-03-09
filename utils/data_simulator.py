@@ -452,6 +452,7 @@ class DataSimulator(object):
             # Dump un-compressed data.
             with open(dumped_fname + ".json", "wt", encoding="ascii") as jsonfile:
                 json.dump(simulated_data, jsonfile)
+        return self.genotype, simulated_data
 
     def get_corpora_index_from_snps_id(self):
         #make snps to index mapping

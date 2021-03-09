@@ -309,11 +309,13 @@ def run_script():
 def run_script_args(pop, corpus_id, sim_ids, model, snps, inds, disease_snps, biased_distr = [], noise_maf_range = [0, 1], disease_maf_range = [0.1, 1], seed=None, compress=False):
 
     sim = DataSim(corpus_id, pop, model, snps, inds, disease_snps, biased_distr, noise_maf_range, disease_maf_range, seed, compress)
+    outputs = []
     for index in range(len(sim_ids)):
         sim.set_sim_id(sim_ids[index])
         sim.sample_snps()
         sim.generate_phenotype()
-        sim.dump_simulated_data()
+        g, d = sim.dump_simulated_data()
+        outputs.append((g, d))
     suffix = "json"
     if compress:
         suffix = "json.bz2"
@@ -323,6 +325,6 @@ def run_script_args(pop, corpus_id, sim_ids, model, snps, inds, disease_snps, bi
     for sim_id in sim_ids:
         print("Generated data:\t./sim/{}_{}_{}.{}".format(sim_id, corpus_id, pop, suffix))
     print("\n############################################################################")
-
+    return outputs
 if __name__ == "__main__":
     run_script()
