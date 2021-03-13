@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<Parameterized Model phenotype="quantitative" size="10010" stdev="1.3">
+	<BaselineModel alpha="15"/>
+	<MarginalModel alpha="2" type="additive">
+		<pos>0</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>1</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>2</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>3</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>4</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>5</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>6</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>7</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>8</pos>
+	</MarginalModel>
+	<MarginalModel alpha="2" type="additive">
+		<pos>9</pos>
+	</MarginalModel>
+</Parameterized Model>

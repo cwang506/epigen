@@ -31,7 +31,7 @@ from scipy import stats
 from scipy.sparse import csc_matrix, lil_matrix, coo_matrix, load_npz
 from tqdm import tqdm
 
-
+script_path = os.path.abspath(os.path.join(__file__, "../.."))
 class DataSimulator(object):
     """Simulates epistasis data given a pre-generated genotype corpus.
     
@@ -93,14 +93,14 @@ class DataSimulator(object):
         
         # Load genotype corpus.
         print("Loading genotype corpus.")
-        if os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.npy"):
+        if os.path.exists(script_path +"/" + "corpora/" + str(corpus_id) + "_" + pop + "_genotype.npy"):
             print("using pickle") #todo: add in bz2 option
-            self.corpus_genotype = np.load("corpora/" + str(corpus_id) + "_" + pop + "_genotype.npy")
-        elif os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json"):
-            with open("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json", "rt") as jsonfile:
+            self.corpus_genotype = np.load(script_path +"/"+"corpora/" + str(corpus_id) + "_" + pop + "_genotype.npy")
+        elif os.path.exists(script_path +"/"+ "corpora/" + str(corpus_id) + "_" + pop + "_genotype.json"):
+            with open(script_path +"/"+"corpora/" + str(corpus_id) + "_" + pop + "_genotype.json", "rt") as jsonfile:
                 self.corpus_genotype = np.asarray(json.load(jsonfile), dtype=np.uint8)
-        elif os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json.bz2"):
-            with bz2.open("corpora/" + str(corpus_id) + "_" + pop + "_genotype.json.bz2", "rt", encoding="ascii") as zipfile:
+        elif os.path.exists(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_genotype.json.bz2"):
+            with bz2.open(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_genotype.json.bz2", "rt", encoding="ascii") as zipfile:
                 self.corpus_genotype = np.asarray(json.load(zipfile), dtype=np.uint8)
         else:
             msg = "Neither the file corpora/" + str(corpus_id) + "_" + pop + "_genotype.json.bz2 "
@@ -114,11 +114,11 @@ class DataSimulator(object):
         
         # Load SNPs.
         print("Loading SNPs.")
-        if os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_snps.json"):
-            with open("corpora/" + str(corpus_id) + "_" + pop + "_snps.json", "rt") as jsonfile:
+        if os.path.exists(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_snps.json"):
+            with open(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_snps.json", "rt") as jsonfile:
                 self.corpus_snps = json.load(jsonfile)
-        elif os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_snps.json.bz2"):
-            with bz2.open("corpora/" + str(corpus_id) + "_" + pop + "_snps.json.bz2", "rt", encoding="ascii") as zipfile:
+        elif os.path.exists(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_snps.json.bz2"):
+            with bz2.open(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_snps.json.bz2", "rt", encoding="ascii") as zipfile:
                 self.corpus_snps = json.load(zipfile)
         else:
             msg = "Neither the file corpora/" + str(corpus_id) + "_" + pop + "_snps.json.bz2 "
@@ -129,11 +129,11 @@ class DataSimulator(object):
         
         # Load MAFs.
         print("Loading MAFs.")
-        if os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_mafs.json"):
-            with open("corpora/" + str(corpus_id) + "_" + pop + "_mafs.json", "rt") as jsonfile:
+        if os.path.exists(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_mafs.json"):
+            with open(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_mafs.json", "rt") as jsonfile:
                 self.corpus_mafs = np.asarray(json.load(jsonfile), dtype=float)
-        elif os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_mafs.json.bz2"):
-            with bz2.open("corpora/" + str(corpus_id) + "_" + pop + "_mafs.json.bz2", "rt", encoding="ascii") as zipfile:
+        elif os.path.exists(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_mafs.json.bz2"):
+            with bz2.open(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_mafs.json.bz2", "rt", encoding="ascii") as zipfile:
                 self.corpus_mafs = np.asarray(json.load(zipfile), dtype=float)
         else:
             msg = "Neither the file corpora/" + str(corpus_id) + "_" + pop + "_mafs.json.bz2 "
@@ -144,11 +144,11 @@ class DataSimulator(object):
         
         # Load cumulative MAF distribution.
         print("Loading cumulative MAF distribution.")
-        if os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json"):
-            with open("corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json", "rt") as jsonfile:
+        if os.path.exists(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json"):
+            with open(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json", "rt") as jsonfile:
                 self.corpus_cum_mafs = json.load(jsonfile)
-        elif os.path.exists("corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json.bz2"):
-            with bz2.open("corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json.bz2", "rt", encoding="ascii") as zipfile:
+        elif os.path.exists(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json.bz2"):
+            with bz2.open(script_path +"/" +"corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json.bz2", "rt", encoding="ascii") as zipfile:
                 self.corpus_cum_mafs = json.load(zipfile)
         else:
             msg = "Neither the file corpora/" + str(corpus_id) + "_" + pop + "_cum_mafs.json.bz2 "
@@ -456,7 +456,7 @@ class DataSimulator(object):
 
     def get_corpora_index_from_snps_id(self):
         #make snps to index mapping
-        fname = os.path.join("corpora", '%s_%s_snps.json' %(self.corpus_id, self.pop))
+        fname = os.path.join(script_path, "corpora", '%s_%s_snps.json' %(self.corpus_id, self.pop))
         if os.path.exists(fname):
             with open(fname, "r") as f:
                 snps_json = json.load(f)
