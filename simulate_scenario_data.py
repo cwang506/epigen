@@ -789,7 +789,7 @@ def simulate_diff_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
     
     
 
-if __name__ == '__main__':
-    simulate_diff_ld_adaptive(10, 300, 100, "ASW", 122, "CEU", 122, 0, 0)
+# if __name__ == '__main__':
+    # simulate_diff_ld_adaptive(10, 300, 100, "ASW", 122, "CEU", 122, 0, 0)
     # simulate_maf_data_adaptive("MAF_LOW", 10, 1000, 3000, "ASW", 122, "CEU", 122, 0, 1)
     
