@@ -2,7 +2,7 @@ from xml.dom import minidom
 
 def generate_model_xml(num_disease_snps, num_non_disease_snps, path_to_file):
     root = minidom.Document()
-    xml = root.createElement('Parameterized Model')
+    xml = root.createElement('ParametrizedModel')
     xml.setAttribute("size", str(num_disease_snps + num_non_disease_snps))
     xml.setAttribute("phenotype", "quantitative")
     xml.setAttribute("stdev", "1.3")

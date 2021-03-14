@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Parameterized Model phenotype="quantitative" size="10010" stdev="1.3">
+<ParametrizedModel phenotype="quantitative" size="3000" stdev="1.3">
 	<BaselineModel alpha="15"/>
 	<MarginalModel alpha="2" type="additive">
 		<pos>0</pos>
@@ -31,4 +31,4 @@
 	<MarginalModel alpha="2" type="additive">
 		<pos>9</pos>
 	</MarginalModel>
-</Parameterized Model>
+</ParametrizedModel>

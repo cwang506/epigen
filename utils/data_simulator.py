@@ -30,6 +30,7 @@ from .parametrized_model import ParametrizedModel
 from scipy import stats
 from scipy.sparse import csc_matrix, lil_matrix, coo_matrix, load_npz
 from tqdm import tqdm
+from src2.config import PATH_TO_EPIGEN_DATA_DIR
 
 script_path = os.path.abspath(os.path.join(__file__, "../.."))
 class DataSimulator(object):
@@ -429,7 +430,7 @@ class DataSimulator(object):
         #pickle genotype instead of dumping in json
         final_filename = str(self.sim_id) + "_" + str(self.corpus_id) + "_" + self.pop + "_" + str(self.num_inds) + "_inds_" + str(self.num_snps) + "_snps_" + "_".join([str(i) for i in terminal_disease_snps]) + "_disease_snps" + "_categorical"
         dumped_fname_local = "sim/" + final_filename
-        dumped_fname_server = "/nobackup1c/users/cwang506/epigen_data2/" + final_filename
+        dumped_fname_server = PATH_TO_EPIGEN_DATA_DIR + final_filename
         on_server = True
 
         if on_server:

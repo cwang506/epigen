@@ -3,6 +3,7 @@ import os
 import numpy as np
 #MAF
 from src2.epigen.simulate_data import run_script_args
+from src2.config import PATH_TO_EPIGEN_DATA_DIR
 maf_num_inds = 10000
 maf_num_snps = 10000
 
@@ -378,7 +379,7 @@ on_server = True
 
 def get_simulated_data_fname(sim_id, corpus_id, pop, num_inds, num_snps, disease_snps, categorical = False):
     #disease snps come from terminal 
-    prefix = "sim/" if not on_server else "/nobackup1c/users/cwang506/epigen_data2/"
+    prefix = "sim/" if not on_server else PATH_TO_EPIGEN_DATA_DIR
     return prefix+ str(sim_id) + "_" + str(corpus_id) + "_" + pop + "_" +\
             str(num_inds) + "_inds_" + str(num_snps) + "_snps_" + "_".join([str(i) for i in disease_snps])\
             + "_disease_snps"+ ("_categorical" if categorical else"") + ".json"
@@ -451,7 +452,7 @@ def simulate_maf_data_normal(save_to_path=True):
             print(disease_snps)
             continue
             train_outputs = run_script_args(maf_dic['pop'],maf_dic['corpus_id'], [maf_dic['sim_id']], "models/param_model_train_simple.xml", maf_dic['num_snps'], maf_dic['num_inds'],
-                        disease_snps)
+                        disease_snps)[0]
             # train_genotype, train_json = outputs[0]                        
             print("generating test data")
             filename = get_simulated_data_fname(maf_dic['sim_id'], maf_dic['corpus_id'], maf_dic['pop'], maf_dic['num_inds'], maf_dic['num_snps'], disease_snps, categorical)
@@ -568,7 +569,7 @@ def simulate_maf_data_different_ld_block(scenario):
     print(disease_snps)
     # disease_snps = disease_snps + other_snps
     train_genotype, train_json = run_script_args(train_pop,train_corpus_id, [0], "models/param_model_test_simple.xml", num_disease_snps+num_other_snps, num_inds,
-                    (disease_snps+other_snps)[:num_disease_snps+num_other_snps])
+                    (disease_snps+other_snps)[:num_disease_snps+num_other_snps])[0]
                 
     print("generating test data")
     filename = get_simulated_data_fname(0, train_corpus_id, train_pop, num_inds, num_disease_snps + num_other_snps, disease_snps, categorical)
@@ -593,7 +594,7 @@ def simulate_maf_data_different_ld_block(scenario):
         snps_in_filename.append(index) #need to map back to CEU data todo
     print(len(snps_in_filename))
     test_genotype, test_json = run_script_args(test_pop,test_corpus_id, [0], "models/param_model_test_simple.xml", len(snps_in_filename), num_inds,
-                snps_in_filename) 
+                snps_in_filename)[0]
 
     return train_genotype, train_json, test_genotype, test_json
 
@@ -630,7 +631,7 @@ def simulate_scenario_data_same_ld_block(scenario):
         print(disease_snps)
         # disease_snps = disease_snps + other_snps
         train_genotype, train_json = run_script_args(train_pop,train_corpus_id, [0], "models/param_model_test_simple.xml", num_disease_snps+num_other_snps, num_inds,
-                        (disease_snps+other_snps)[:num_disease_snps+num_other_snps])
+                        (disease_snps+other_snps)[:num_disease_snps+num_other_snps])[0]
                     
         print("generating test data")
         filename = get_simulated_data_fname(0, train_corpus_id, train_pop, num_inds, num_disease_snps + num_other_snps, disease_snps, categorical)
@@ -655,7 +656,7 @@ def simulate_scenario_data_same_ld_block(scenario):
         #     snps_in_filename.append(index) #need to map back to CEU data todo
         # print(len(snps_in_filename))
         test_genotype, test_json = run_script_args(test_pop,test_corpus_id, [0], "models/param_model_test_simple.xml", len(snps_in_filename), num_inds,
-                    snps_in_filename) 
+                    snps_in_filename)[0]
         return train_genotype, train_json, test_genotype, test_json
 
 from src2.config import MAF_SETTINGS, PATH_TO_XML_MODELS_DIR
@@ -686,9 +687,10 @@ def simulate_maf_data_adaptive(scenario, num_disease_snps, n, d, train_pop, trai
         raise RuntimeError("Please choose different random seeds as there are overlap between the disease SNPs and the non-disease SNPs")
     #generate XML file for model
     PATH_TO_XML_MODEL = PATH_TO_XML_MODELS_DIR + "%s_disease_snps_%s_non_disease_snps.xml"%(num_disease_snps, d)
-    generate_model_xml(num_disease_snps, d, PATH_TO_XML_MODEL)
+    if not os.path.exists(PATH_TO_XML_MODEL):
+        generate_model_xml(num_disease_snps, d-num_disease_snps, PATH_TO_XML_MODEL)
 
-    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps.tolist() + training_other_snps.tolist())
+    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps.tolist() + training_other_snps.tolist())[0]
 
     corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop,test_corpus_id)
     test_snps = [] 
@@ -697,13 +699,97 @@ def simulate_maf_data_adaptive(scenario, num_disease_snps, n, d, train_pop, trai
         snp = train_json['snps'][snps_id]
         index = corpora_snps_mapping_other_set[snp[0]]
         test_snps.append(index)
-    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps)
+    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps)[0]
     return train_genotype, train_json, test_genotype, test_json
 
 def simulate_same_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id, test_pop, test_corpus_id, random_seed_disease_snps, random_seed_other_snps,\
     path_to_models = PATH_TO_XML_MODELS_DIR, disease_snps = None):
-
+    num_other_snps = d-num_disease_snps
     if disease_snps is None:
-        pass
-if __name__ == '__main__':
-    simulate_maf_data_adaptive("MAF_LOW", 10, 1000, 3000, "ASW", 122, "CEU", 122, 0, 1)
+        snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
+        possible_snps = list(snp_to_maf_training.keys())
+        corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
+        possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
+        possible_snps.sort() 
+        #randomly choose an index to start picking the disease snps from
+        np.random.seed(random_seed_disease_snps)
+        index = np.random.choice(len(possible_snps) - num_disease_snps, size=1).item(0)
+        disease_snps = possible_snps[index:index+num_disease_snps]
+    #get other snps
+    min_snp = min(disease_snps)
+    max_snp = max(disease_snps)
+    lower_bound = num_other_snps //2 # gets the lower amount of disease snps
+    upper_bound = num_other_snps - lower_bound
+    other_snps = possible_snps[min_snp - lower_bound:min_snp] + possible_snps[max_snp:max_snp + upper_bound]
+    assert len(disease_snps + other_snps) == d, "Number of training SNPs is incorrect"
+    #generate risk model
+    PATH_TO_XML_MODEL = PATH_TO_XML_MODELS_DIR + "%s_disease_snps_%s_non_disease_snps.xml"%(num_disease_snps, d)
+    if not os.path.exists(PATH_TO_XML_MODEL):
+        generate_model_xml(num_disease_snps, num_other_snps, PATH_TO_XML_MODEL)
+
+    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps + other_snps)[0]
+
+    corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop, test_corpus_id)
+    test_snps = [] 
+    #make the snps the same from train to test
+    for snps_id in train_json['disease_snps']:
+        snp = train_json['snps'][snps_id]
+        index = corpora_snps_mapping_other_set[snp[0]]
+        test_snps.append(index)
+    assert len(test_snps) == d, "Number of test SNPs is incorrect"
+    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps)[0]
+    return train_genotype, train_json, test_genotype, test_json
+
+def simulate_diff_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id, test_pop, test_corpus_id, random_seed_disease_snps, random_seed_other_snps,\
+    path_to_models = PATH_TO_XML_MODELS_DIR, disease_snps=None):
+    num_other_snps = d - num_disease_snps
+    if disease_snps is None:
+        snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
+        possible_snps = list(snp_to_maf_training.keys())
+        corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
+        possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
+        np.random.seed(random_seed_disease_snps)
+        disease_snps = np.random.choice(possible_snps, size=num_disease_snps)
+    
+    #find other snps
+    num_in_each_block = num_other_snps // num_disease_snps
+    lower_half = num_in_each_block//2
+    upper_half = num_in_each_block - lower_half
+    print(lower_half, upper_half)
+    other_snps = []
+    for i in disease_snps:
+        other_snps_added = list(range(i-lower_half, i)) + list(range(i+1, i+1+upper_half))
+        print(len(other_snps_added))
+        other_snps += other_snps_added
+    if len(other_snps) != num_other_snps:
+        print("Adding on extra snps")
+        diff = num_other_snps - len(other_snps)
+        last = other_snps[-1]
+        other_snps += list(range(last+1, last+1+diff))
+    disease_snps = disease_snps.tolist()
+
+    assert len(disease_snps + other_snps) == d, "Number of training SNPs is incorrect"
+    #generate risk model
+    PATH_TO_XML_MODEL = PATH_TO_XML_MODELS_DIR + "%s_disease_snps_%s_non_disease_snps.xml"%(num_disease_snps, d)
+    if not os.path.exists(PATH_TO_XML_MODEL):
+        generate_model_xml(num_disease_snps, num_other_snps, PATH_TO_XML_MODEL)
+
+    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps + other_snps)[0]
+
+    corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop, test_corpus_id)
+    test_snps = [] 
+    #make the snps the same from train to test
+    for snps_id in train_json['disease_snps']:
+        snp = train_json['snps'][snps_id]
+        index = corpora_snps_mapping_other_set[snp[0]]
+        test_snps.append(index)
+    assert len(test_snps) == d, "Number of test SNPs is incorrect"
+    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps)[0]
+    return train_genotype, train_json, test_genotype, test_json
+    
+    
+
+# if __name__ == '__main__':
+    # simulate_diff_ld_adaptive(10, 300, 100, "ASW", 122, "CEU", 122, 0, 0)
+    # simulate_maf_data_adaptive("MAF_LOW", 10, 1000, 3000, "ASW", 122, "CEU", 122, 0, 1)
+    
