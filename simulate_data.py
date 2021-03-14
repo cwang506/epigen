@@ -246,8 +246,8 @@ You can also use your own corpora -- simply run the script ``generate_genotype_c
     
 """
 
-from utils.data_simulator import DataSimulator as DataSim
-import utils.argparse_checks as checks
+from src2.epigen.utils.data_simulator import DataSimulator as DataSim
+import src2.epigen.utils.argparse_checks as checks
 import argparse
 
 
