@@ -73,7 +73,7 @@ class DataSimulator(object):
         compress (bool): If True, the simulated data is compressed.
     """
 
-    def __init__(self, corpus_id, pop, model, num_snps, num_inds, disease_snps, biased_distr, noise_maf_range, disease_maf_range, seed, compress):
+    def __init__(self, corpus_id, pop, model, num_snps, num_inds, disease_snps, biased_distr, noise_maf_range, disease_maf_range, seed, compress, num_disease_snps):
         """Initialized DataSimulator.
         
         Args:
@@ -111,6 +111,7 @@ class DataSimulator(object):
         self.genotype = None
         self.total_num_snps = np.shape(self.corpus_genotype)[0]
         self.total_num_inds = np.shape(self.corpus_genotype)[1]
+        self.num_disease_snps = num_disease_snps
         print("Genotype corpus contains {} SNPs and {} individuals.".format(self.total_num_snps, self.total_num_inds))
         
         # Load SNPs.
@@ -421,7 +422,7 @@ class DataSimulator(object):
        
         snps_mapping = self.get_corpora_index_from_snps_id()
         terminal_disease_snps = []
-        for i in self.disease_snps[:10]:
+        for i in self.disease_snps[:self.num_disease_snps]:
             snp_id = self.snps[i][0] #rsid
             terminal_index = snps_mapping[snp_id]
             terminal_disease_snps.append(terminal_index)
@@ -433,12 +434,15 @@ class DataSimulator(object):
         dumped_fname_server = PATH_TO_EPIGEN_DATA_DIR + final_filename
         on_server = True
 
+
         if on_server:
             dumped_fname = dumped_fname_server
         else:
             dumped_fname = dumped_fname_local
+        print(dumped_fname)
         dumped_fname_genotype = dumped_fname + "_genotype"
         np.save(dumped_fname_genotype, self.genotype)
+
 
         if model_type == "quantitative":
             simulated_data = {"num_snps" : self.num_snps, "num_inds" : self.num_inds, "model_type" : "quantitative", "phenotype" : self.phenotype.tolist(), "snps" : self.snps, "disease_snps" : self.disease_snps, "mafs" : self.mafs.tolist()}

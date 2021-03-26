@@ -306,9 +306,9 @@ def run_script():
         print("Generated data:\t./sim/{}_{}_{}.{}".format(sim_id, args.corpus_id, args.pop, suffix))
     print("\n############################################################################")
 
-def run_script_args(pop, corpus_id, sim_ids, model, snps, inds, disease_snps, biased_distr = [], noise_maf_range = [0, 1], disease_maf_range = [0.1, 1], seed=None, compress=False):
+def run_script_args(pop, corpus_id, sim_ids, model, snps, inds, disease_snps, num_disease_snps, biased_distr = [], noise_maf_range = [0, 1], disease_maf_range = [0.1, 1], seed=None, compress=False):
 
-    sim = DataSim(corpus_id, pop, model, snps, inds, disease_snps, biased_distr, noise_maf_range, disease_maf_range, seed, compress)
+    sim = DataSim(corpus_id, pop, model, snps, inds, disease_snps, biased_distr, noise_maf_range, disease_maf_range, seed, compress, num_disease_snps)
     outputs = []
     for index in range(len(sim_ids)):
         sim.set_sim_id(sim_ids[index])

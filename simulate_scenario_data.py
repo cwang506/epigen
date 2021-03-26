@@ -690,7 +690,7 @@ def simulate_maf_data_adaptive(scenario, num_disease_snps, n, d, train_pop, trai
     if not os.path.exists(PATH_TO_XML_MODEL):
         generate_model_xml(num_disease_snps, d-num_disease_snps, PATH_TO_XML_MODEL)
 
-    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps.tolist() + training_other_snps.tolist(),\
+    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps.tolist() + training_other_snps.tolist(),num_disease_snps,\
         seed=epigen_seed)[0]
 
     corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop,test_corpus_id)
@@ -700,8 +700,8 @@ def simulate_maf_data_adaptive(scenario, num_disease_snps, n, d, train_pop, trai
         snp = train_json['snps'][snps_id]
         index = corpora_snps_mapping_other_set[snp[0]]
         test_snps.append(index)
-    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps, seed=epigen_seed)[0]
-    return train_genotype, train_json, test_genotype, test_json
+    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps, num_disease_snps, seed=epigen_seed)[0]
+    return train_genotype, train_json, test_genotype, test_json, disease_snps
 
 def simulate_same_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id, test_pop, test_corpus_id, random_seed_disease_snps,\
     path_to_models = PATH_TO_XML_MODELS_DIR, disease_snps = None, epigen_seed = 0):
@@ -728,7 +728,7 @@ def simulate_same_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
     if not os.path.exists(PATH_TO_XML_MODEL):
         generate_model_xml(num_disease_snps, num_other_snps, PATH_TO_XML_MODEL)
 
-    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps + other_snps, seed=epigen_seed)[0]
+    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps + other_snps, num_disease_snps, seed=epigen_seed)[0]
 
     corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop, test_corpus_id)
     test_snps = [] 
@@ -738,8 +738,8 @@ def simulate_same_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
         index = corpora_snps_mapping_other_set[snp[0]]
         test_snps.append(index)
     assert len(test_snps) == d, "Number of test SNPs is incorrect"
-    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps, seed=epigen_seed)[0]
-    return train_genotype, train_json, test_genotype, test_json
+    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps, num_disease_snps, seed=epigen_seed)[0]
+    return train_genotype, train_json, test_genotype, test_json, disease_snps
 
 def simulate_diff_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id, test_pop, test_corpus_id, random_seed_disease_snps,\
     path_to_models = PATH_TO_XML_MODELS_DIR, disease_snps=None, epigen_seed=0):
@@ -775,7 +775,7 @@ def simulate_diff_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
     if not os.path.exists(PATH_TO_XML_MODEL):
         generate_model_xml(num_disease_snps, num_other_snps, PATH_TO_XML_MODEL)
 
-    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps + other_snps, seed=epigen_seed)[0]
+    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps + other_snps,num_disease_snps, seed=epigen_seed)[0]
 
     corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop, test_corpus_id)
     test_snps = [] 
@@ -785,8 +785,8 @@ def simulate_diff_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
         index = corpora_snps_mapping_other_set[snp[0]]
         test_snps.append(index)
     assert len(test_snps) == d, "Number of test SNPs is incorrect"
-    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps, seed=epigen_seed)[0]
-    return train_genotype, train_json, test_genotype, test_json
+    test_genotype, test_json = run_script_args(test_pop, test_corpus_id, [0], PATH_TO_XML_MODEL, d, n, test_snps, num_disease_snps, seed=epigen_seed)[0]
+    return train_genotype, train_json, test_genotype, test_json, disease_snps
     
     
 
