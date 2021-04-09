@@ -665,24 +665,27 @@ def simulate_maf_data_adaptive(scenario, num_disease_snps, n, d, train_pop, trai
     path_to_models = PATH_TO_XML_MODELS_DIR, disease_snps = None, epigen_seed=0):
     #scenario can either be MAF_LOW, MAF_MIDDLE, MAF_HIGH
     #todo: do adaptive d
-    if disease_snps is None:
-        maf_min = MAF_SETTINGS[scenario]["low"]
-        maf_max = MAF_SETTINGS[scenario]["high"]
-        snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
-        # print(len(snp_to_maf_training))
-        training_total_num_snps = len(snp_to_maf_training)
-        possible_snps = [snp_id for snp_id in snp_to_maf_training.keys() \
-                    if snp_to_maf_training[snp_id]>=maf_min and snp_to_maf_training[snp_id]<=maf_max]
-        corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
-        possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
-        np.random.seed(random_seed_disease_snps)
-        disease_snps = np.random.choice(possible_snps, num_disease_snps)
-    assert len(disease_snps) == num_disease_snps, "Number of disease SNPs specified does not match length of disease SNPs list"
-    print("disease snps: ", disease_snps)
-
+    
+    maf_min = MAF_SETTINGS[scenario]["low"]
+    maf_max = MAF_SETTINGS[scenario]["high"]
+    snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
+    # print(len(snp_to_maf_training))
+    training_total_num_snps = len(snp_to_maf_training) 
+    possible_snps = [snp_id for snp_id in snp_to_maf_training.keys() \
+                if snp_to_maf_training[snp_id]>=maf_min and snp_to_maf_training[snp_id]<=maf_max]
+    corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
+    possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
     possible_other_snps = range(training_total_num_snps)
     np.random.seed(random_seed_other_snps)
     training_other_snps = np.random.choice(possible_other_snps, d - num_disease_snps)
+    
+    if disease_snps is None:
+        np.random.seed(random_seed_disease_snps)
+        disease_snps = np.random.choice(possible_snps, num_disease_snps).tolist()
+    assert len(disease_snps) == num_disease_snps, "Number of disease SNPs specified does not match length of disease SNPs list"
+    print("disease snps: ", disease_snps)
+
+    
     if set(training_other_snps).intersection(set(disease_snps)):
         raise RuntimeError("Please choose different random seeds as there are overlap between the disease SNPs and the non-disease SNPs")
     #generate XML file for model
@@ -690,7 +693,7 @@ def simulate_maf_data_adaptive(scenario, num_disease_snps, n, d, train_pop, trai
     if not os.path.exists(PATH_TO_XML_MODEL):
         generate_model_xml(num_disease_snps, d-num_disease_snps, PATH_TO_XML_MODEL)
 
-    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps.tolist() + training_other_snps.tolist(),num_disease_snps,\
+    train_genotype, train_json = run_script_args(train_pop, train_corpus_id, [0], PATH_TO_XML_MODEL, d, n, disease_snps + training_other_snps.tolist(),num_disease_snps,\
         seed=epigen_seed)[0]
 
     corpora_snps_mapping_other_set = get_corpora_index_from_snps_id(test_pop,test_corpus_id)
@@ -706,16 +709,17 @@ def simulate_maf_data_adaptive(scenario, num_disease_snps, n, d, train_pop, trai
 def simulate_same_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id, test_pop, test_corpus_id, random_seed_disease_snps,\
     path_to_models = PATH_TO_XML_MODELS_DIR, disease_snps = None, epigen_seed = 0):
     num_other_snps = d-num_disease_snps
-    if disease_snps is None:
-        snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
-        possible_snps = list(snp_to_maf_training.keys())
-        corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
-        possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
-        possible_snps.sort() 
+    
+    snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
+    possible_snps = list(snp_to_maf_training.keys())
+    corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
+    possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
+    possible_snps.sort() 
         #randomly choose an index to start picking the disease snps from
+    if disease_snps is None:
         np.random.seed(random_seed_disease_snps)
         index = np.random.choice(len(possible_snps) - num_disease_snps, size=1).item(0)
-        disease_snps = possible_snps[index:index+num_disease_snps]
+        disease_snps = possible_snps[index:index+num_disease_snps].tolist()
     #get other snps
     min_snp = min(disease_snps)
     max_snp = max(disease_snps)
@@ -744,13 +748,14 @@ def simulate_same_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
 def simulate_diff_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id, test_pop, test_corpus_id, random_seed_disease_snps,\
     path_to_models = PATH_TO_XML_MODELS_DIR, disease_snps=None, epigen_seed=0):
     num_other_snps = d - num_disease_snps
-    if disease_snps is None:
-        snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
-        possible_snps = list(snp_to_maf_training.keys())
-        corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
-        possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
+    
+    snp_to_maf_training = get_maf_dict(train_pop, train_corpus_id)
+    possible_snps = list(snp_to_maf_training.keys())
+    corpora_snps_mapping = get_corpora_index_from_snps_id(train_pop, train_corpus_id)
+    possible_snps = [(corpora_snps_mapping[snp_id]) for snp_id in possible_snps]
+    if disease_snps is None:    
         np.random.seed(random_seed_disease_snps)
-        disease_snps = np.random.choice(possible_snps, size=num_disease_snps)
+        disease_snps = np.random.choice(possible_snps, size=num_disease_snps).tolist()
     
     #find other snps
     num_in_each_block = num_other_snps // num_disease_snps
