@@ -719,7 +719,7 @@ def simulate_same_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
     if disease_snps is None:
         np.random.seed(random_seed_disease_snps)
         index = np.random.choice(len(possible_snps) - num_disease_snps, size=1).item(0)
-        disease_snps = possible_snps[index:index+num_disease_snps].tolist()
+        disease_snps = possible_snps[index:index+num_disease_snps]
     #get other snps
     min_snp = min(disease_snps)
     max_snp = max(disease_snps)
@@ -761,18 +761,15 @@ def simulate_diff_ld_adaptive(num_disease_snps, n, d, train_pop, train_corpus_id
     num_in_each_block = num_other_snps // num_disease_snps
     lower_half = num_in_each_block//2
     upper_half = num_in_each_block - lower_half
-    print(lower_half, upper_half)
     other_snps = []
     for i in disease_snps:
         other_snps_added = list(range(i-lower_half, i)) + list(range(i+1, i+1+upper_half))
-        print(len(other_snps_added))
         other_snps += other_snps_added
     if len(other_snps) != num_other_snps:
         print("Adding on extra snps")
         diff = num_other_snps - len(other_snps)
         last = other_snps[-1]
         other_snps += list(range(last+1, last+1+diff))
-    disease_snps = disease_snps.tolist()
 
     assert len(disease_snps + other_snps) == d, "Number of training SNPs is incorrect"
     #generate risk model
